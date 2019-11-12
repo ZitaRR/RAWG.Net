@@ -21,7 +21,7 @@ namespace RAWG.Net
             HttpResponseMessage response = await client.SendAsync(request);
 
             if (response.StatusCode == HttpStatusCode.NotFound)
-                return new Result(null, null).Initialize(response.StatusCode);
+                return new Result().Initialize(response.StatusCode);
 
             string content = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<Result>(content).Initialize(HttpStatusCode.OK);
