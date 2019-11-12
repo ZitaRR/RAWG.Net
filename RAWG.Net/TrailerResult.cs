@@ -6,8 +6,8 @@
         public int? ID { get; private set; }
         public string URI { get; private set; }
 
-        internal int count;
-        internal dynamic[] data;
+        private int count;
+        private dynamic[] data;
 
         public TrailerResult(int count = 0, int index = 0, params dynamic[] results)
         {

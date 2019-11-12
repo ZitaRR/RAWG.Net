@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions;
-using System.Net;
 
 namespace RAWG.Net
 {
@@ -15,19 +13,23 @@ namespace RAWG.Net
         public string ImageURI { get; private set; }
         public string Website { get; private set; }
         public Rating UserRating { get; private set; }
+        public string ESRB { get; private set; }
+        public int DeveloperID { get; private set; }
 
         public GameResult(string name = null, int? id = null, string description = "", int? metaCritic = null,
-            string released = null, string background_image = null, string website = null, params Rating[] ratings)
+            string released = null, string background_image = null, string website = null, dynamic esrb_rating = null,
+            Rating[] ratings = null, params dynamic[] developers)
         {
             Name = name;
             ID = id;
-            description = Regex.Replace(description, @"<[^>]*>", "");
-            Description = Regex.Replace(description, @"[\.\,\-\!\?]", (c) => c.NextMatch().Value == " " ? c + " " : "");
+            Description = RAWGClient.FormatText(description);
             MetaCritic = metaCritic;
             Released = DateTime.TryParse(released, out DateTime time) ? time as DateTime? : null;
             ImageURI = background_image;
             Website = website;
-            UserRating = ratings.Length > 0 ? ratings[0] : null;
+            UserRating = ratings is null || ratings.Length == 0 ? null : ratings[0];
+            ESRB = esrb_rating?.name ?? "N/A";
+            DeveloperID = developers[0].id;
         }
 
         public async Task<TrailerResult[]> GetTrailersAsync()
@@ -46,11 +48,13 @@ namespace RAWG.Net
             string image = GetValue(ImageURI);
             string website = GetValue(Website);
             string rating = GetValue(UserRating);
+            string developerID = GetValue(DeveloperID);
 
-            var trailers = GetTrailersAsync();
-            string _trailers = "";
-            foreach (var trailer in trailers.Result)
-                _trailers += trailer.ToString();
+            var trailers = GetTrailersAsync().Result;
+            string _trailers = "N/A";
+            if (trailers != null)
+                foreach (var trailer in trailers)
+                    _trailers += trailer.ToString();
 
             return $"Name: {Name}\n" +
                 $"ID: {ID}\n" +
@@ -59,7 +63,9 @@ namespace RAWG.Net
                 $"Release: {release}\n" +
                 $"Image-URI: {image}\n" +
                 $"Website: {website}\n" +
+                $"Developer ID: {developerID}\n" +
                 $"Rating: {rating}\n" +
+                $"ESRB Rating: {ESRB}\n" +
                 $"Trailer(s): {_trailers}";
         }
 
@@ -81,7 +87,7 @@ namespace RAWG.Net
             public override string ToString()
             {
                 return $"\n      Title: {Title}\n" +
-                    $"      User Ratings: {Count} ({Percentage}%)\n";
+                    $"      User Ratings: {Count} ({Percentage}%)";
             }
         }
     }

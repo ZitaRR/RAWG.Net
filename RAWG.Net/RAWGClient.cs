@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -16,7 +17,22 @@ namespace RAWG.Net
             client.DefaultRequestHeaders.Add("User-Agent", "RAWG Wrapper");
         }
 
-        internal async Task<T> SendRequestAsync<T>(string query) where T : Result
+        internal static string FormatText(string text)
+        {
+            text = Regex.Replace(text, @"<[^>]*>", "");
+            return Regex.Replace(text, @"[\.\,\-\!\?]", (c) => c.NextMatch().Value == " " ? c + " " : c.Value);
+        }
+
+        public async Task<dynamic> Test(string query)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, ENDPOINT + query);
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            string content = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<dynamic>(content);
+        }
+
+        public async Task<T> SendRequestAsync<T>(string query) where T : Result
         {
             var request = new HttpRequestMessage(HttpMethod.Get, query);
             HttpResponseMessage response = await client.SendAsync(request);
