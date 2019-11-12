@@ -1,17 +1,24 @@
-﻿namespace RAWG.Net
+﻿using System.Net;
+
+namespace RAWG.Net
 {
     public class Result
     {
         public string Name { get; private set; }
         public int? ID { get; private set; }
 
-        private Response response;
+        private Response response = null;
 
-        public Result(string name, int? id, string response = "Ok")
+        public Result(string name, int? id)
         {
-            this.response = new Response(response);
             Name = name;
             ID = id;
+        }
+
+        internal Result Initialize(HttpStatusCode status)
+        {
+            response = new Response(status);
+            return this;
         }
 
         public override string ToString()

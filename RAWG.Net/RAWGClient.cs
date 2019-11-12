@@ -19,29 +19,21 @@ namespace RAWG.Net
         {
             var request = new HttpRequestMessage(HttpMethod.Get, query);
             HttpResponseMessage response = await client.SendAsync(request);
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+                return new Result(null, null).Initialize(response.StatusCode);
+
             string content = await response.Content.ReadAsStringAsync();
-            try
-            {
-                var data = JsonConvert.DeserializeObject<dynamic>(content);
-                string error = data.detail.ToString();
-                return new Result(null, null, error);
-            }
-            catch
-            {
-                return JsonConvert.DeserializeObject<Result>(content);
-            }
+            return JsonConvert.DeserializeObject<Result>(content).Initialize(HttpStatusCode.OK);
         }
 
         public async Task<Result> GetGame(int id)
-        {
-            var response = await SendRequestAsync("https://api.rawg.io/api/games/" + id);
-            return new Result(response.Name, response.ID);
-        }
+            => await SendRequestAsync("https://api.rawg.io/api/games/" + id);
 
         public async Task<Result> GetGame(string slug)
         {
-            var response = await SendRequestAsync("https://api.rawg.io/api/games/" + slug);
-            return new Result(response.Name, response.ID);
+            slug = slug.Replace(" ", "-");
+            return await SendRequestAsync("https://api.rawg.io/api/games/" + slug);
         }
     }
 }
