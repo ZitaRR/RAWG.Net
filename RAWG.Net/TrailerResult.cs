@@ -29,13 +29,15 @@
             TrailerResult[] trailers = new TrailerResult[count];
             trailers[0] = this;
             for (int i = 1; i < count; i++)
-                trailers[i] = new TrailerResult(index: i, results: data);
+                trailers[i] = new TrailerResult(count, i, data);
             return trailers;
         }
 
         public override string ToString()
         {
-            return $"Title: {Title}\nID: {ID}\nURI: {URI}";
+            return $"\n      Title: {Title}\n" +
+                $"      ID: {ID}\n" +
+                $"      URI: {URI}\n\n";
         }
     }
 }

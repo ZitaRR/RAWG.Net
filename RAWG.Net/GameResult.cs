@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Net;
 
 namespace RAWG.Net
 {
@@ -14,7 +15,6 @@ namespace RAWG.Net
         public string ImageURI { get; private set; }
         public string Website { get; private set; }
         public Rating UserRating { get; private set; }
-        public TrailerResult[] Trailers { get; private set; }
 
         public GameResult(string name = null, int? id = null, string description = "", int? metaCritic = null,
             string released = null, string background_image = null, string website = null, params Rating[] ratings)
@@ -33,8 +33,7 @@ namespace RAWG.Net
         public async Task<TrailerResult[]> GetTrailersAsync()
         {
             var trailers = await client.SendRequestAsync<TrailerResult>(RAWGClient.ENDPOINT + $"games/{ID}/movies");
-            Trailers = trailers.Initialize();
-            return Trailers;
+            return trailers.Initialize();
         }
 
         public override string ToString()
@@ -48,6 +47,11 @@ namespace RAWG.Net
             string website = GetValue(Website);
             string rating = GetValue(UserRating);
 
+            var trailers = GetTrailersAsync();
+            string _trailers = "";
+            foreach (var trailer in trailers.Result)
+                _trailers += trailer.ToString();
+
             return $"Name: {Name}\n" +
                 $"ID: {ID}\n" +
                 $"Description: {Description}\n" +
@@ -55,7 +59,8 @@ namespace RAWG.Net
                 $"Release: {release}\n" +
                 $"Image-URI: {image}\n" +
                 $"Website: {website}\n" +
-                $"Rating: {rating}";
+                $"Rating: {rating}\n" +
+                $"Trailer(s): {_trailers}";
         }
 
         public class Rating
