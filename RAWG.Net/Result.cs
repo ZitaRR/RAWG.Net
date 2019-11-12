@@ -8,9 +8,11 @@ namespace RAWG.Net
         public DateTime Time { get; protected set; } = DateTime.Now;
 
         internal Response response;
+        protected RAWGClient client;
 
-        internal Result Initialize(HttpStatusCode status)
+        internal Result Initialize(HttpStatusCode status, RAWGClient client)
         {
+            this.client = client;
             response = new Response(status);
             return this;
         }
@@ -33,28 +35,6 @@ namespace RAWG.Net
         public override string ToString()
         {
             return $"[{Time.ToString("HH:mm:ss")}] {response.ToString()}";
-        }
-
-        public class Rating
-        {
-            public int ID { get; private set; }
-            public string Title { get; private set; }
-            public int Count { get; private set; }
-            public float Percentage { get; private set; }
-
-            public Rating(int id, string title, int count, float percent)
-            {
-                ID = id;
-                Title = char.ToUpper(title[0]) + title.Substring(1);
-                Count = count;
-                Percentage = percent;
-            }
-
-            public override string ToString()
-            {
-                return $"\n      Title: {Title}\n" +
-                    $"      User Ratings: {Count} ({Percentage}%)\n";
-            }
         }
     }
 }

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
+using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 
 namespace RAWG.Net
@@ -16,6 +14,7 @@ namespace RAWG.Net
         public string ImageURI { get; private set; }
         public string Website { get; private set; }
         public Rating UserRating { get; private set; }
+        public TrailerResult[] Trailers { get; private set; }
 
         public GameResult(string name = null, int? id = null, string description = "", int? metaCritic = null,
             string released = null, string background_image = null, string website = null, params Rating[] ratings)
@@ -29,6 +28,13 @@ namespace RAWG.Net
             ImageURI = background_image;
             Website = website;
             UserRating = ratings.Length > 0 ? ratings[0] : null;
+        }
+
+        public async Task<TrailerResult[]> GetTrailersAsync()
+        {
+            var trailers = await client.SendRequestAsync<TrailerResult>(RAWGClient.ENDPOINT + $"games/{ID}/movies");
+            Trailers = trailers.Initialize();
+            return Trailers;
         }
 
         public override string ToString()
@@ -50,6 +56,28 @@ namespace RAWG.Net
                 $"Image-URI: {image}\n" +
                 $"Website: {website}\n" +
                 $"Rating: {rating}";
+        }
+
+        public class Rating
+        {
+            public int ID { get; private set; }
+            public string Title { get; private set; }
+            public int Count { get; private set; }
+            public float Percentage { get; private set; }
+
+            public Rating(int id, string title, int count, float percent)
+            {
+                ID = id;
+                Title = char.ToUpper(title[0]) + title.Substring(1);
+                Count = count;
+                Percentage = percent;
+            }
+
+            public override string ToString()
+            {
+                return $"\n      Title: {Title}\n" +
+                    $"      User Ratings: {Count} ({Percentage}%)\n";
+            }
         }
     }
 }
