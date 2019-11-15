@@ -30,7 +30,8 @@ namespace RAWG.Net
                 return null;
 
             var dlcs = new DLCResult[count];
-            for (int i = 0; i < count; i++)
+            dlcs[0] = this;
+            for (int i = 1; i < count; i++)
                 dlcs[i] = new DLCResult(count, i, data);
             return dlcs;
         }
