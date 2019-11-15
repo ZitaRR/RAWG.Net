@@ -6,29 +6,14 @@ namespace RAWG.Net
 {
     public class DeveloperResult : Result
     {
-        public string Name { get; private set; }
-        public int? ID { get; private set; }
-        public string Description { get; private set; }
-        public IReadOnlyCollection<GameResult> Games
-        {
-            get
-            {
-                if (games != null)
-                    return new ReadOnlyCollection<GameResult>(games);
-                games = new List<GameResult>();
-                for (int i = 0; i < data.Count; i++)
-                {
-                    int id = data[i];
-                    Task<GameResult> e = client.GetGameAsync(id);
-                    games.Add(e.Result);
-                }
-                return new ReadOnlyCollection<GameResult>(games);
-            }
-        }
-        public string ImageURI { get; private set; }
+        public string Name { get; }
+        public int? ID { get; }
+        public string Description { get; }
+        public string ImageURI { get; }
 
         private List<GameResult> games;
-        private dynamic data;
+        private ReadOnlyCollection<GameResult> gamesReadonly;
+        private readonly dynamic data;
 
         public DeveloperResult(params dynamic[] results)
         {
@@ -38,10 +23,25 @@ namespace RAWG.Net
             data = results[0].top_games;
         }
 
+        public async Task<IReadOnlyCollection<GameResult>> GetGames()
+        {
+            if (games != null && gamesReadonly != null)
+                return gamesReadonly;
+            games = new List<GameResult>();
+            for (int i = 0; i < data.Count; i++)
+            {
+                int id = data[i];
+                GameResult game = await client.GetGameAsync(id);
+                games.Add(game);
+            }
+            gamesReadonly = new ReadOnlyCollection<GameResult>(games);
+            return gamesReadonly;
+        }
+
         public override string ToString()
         {
             string _games = "";
-            foreach (var game in Games)
+            foreach (var game in gamesReadonly)
                 _games += game.ToString() + "\n\n";
 
             return $"Company: {Name}\n" +

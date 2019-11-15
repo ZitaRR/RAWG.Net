@@ -25,7 +25,7 @@ namespace RAWG.Net
 
         public async Task<dynamic> Test(string query)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, ENDPOINT + query);
+            var request = new HttpRequestMessage(HttpMethod.Get, query);
             HttpResponseMessage response = await client.SendAsync(request);
 
             string content = await response.Content.ReadAsStringAsync();

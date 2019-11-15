@@ -5,20 +5,21 @@ namespace RAWG.Net
 {
     public class GameResult : Result
     {
-        public string Name { get; private set; }
-        public int? ID { get; private set; }
-        public string Description { get; private set; }
-        public int? MetaCritic { get; private set; }
-        public DateTime? Released { get; private set; }
-        public string ImageURI { get; private set; }
-        public string Website { get; private set; }
-        public Rating UserRating { get; private set; }
-        public string ESRB { get; private set; }
-        public int DeveloperID { get; private set; }
+        public string Name { get; }
+        public int? ID { get; }
+        public string Description { get; }
+        public int? MetaCritic { get; }
+        public DateTime? Released { get; }
+        public string ImageURI { get; }
+        public string Website { get; }
+        public Rating UserRating { get; }
+        public string ESRB { get; }
+        public int DeveloperID { get; }
+        public int PublisherID { get; }
 
         public GameResult(string name = null, int? id = null, string description = "", int? metaCritic = null,
             string released = null, string background_image = null, string website = null, dynamic esrb_rating = null,
-            Rating[] ratings = null, params dynamic[] developers)
+            Rating[] ratings = null, dynamic[] developers = null, dynamic[] publishers = null)
         {
             Name = name;
             ID = id;
@@ -30,6 +31,13 @@ namespace RAWG.Net
             UserRating = ratings is null || ratings.Length == 0 ? null : ratings[0];
             ESRB = esrb_rating?.name ?? "N/A";
             DeveloperID = developers[0].id;
+            PublisherID = publishers[0].id;
+        }
+
+        public async Task<DLCResult[]> GetDLCsAsync()
+        {
+            var dlcs = await client.SendRequestAsync<DLCResult>(RAWGClient.ENDPOINT + $"games/{ID}/additions");
+            return dlcs.Initialize();
         }
 
         public async Task<TrailerResult[]> GetTrailersAsync()
@@ -37,6 +45,12 @@ namespace RAWG.Net
             var trailers = await client.SendRequestAsync<TrailerResult>(RAWGClient.ENDPOINT + $"games/{ID}/movies");
             return trailers.Initialize();
         }
+
+        public async Task<DeveloperResult> GetDeveloperAsync()
+            => await client.SendRequestAsync<DeveloperResult>(RAWGClient.ENDPOINT + $"developers/{DeveloperID}");
+
+        public async Task<PublisherResult> GetPublisherAsync()
+            => await client.SendRequestAsync<PublisherResult>(RAWGClient.ENDPOINT + $"publishers/{PublisherID}");
 
         public override string ToString()
         {
@@ -49,12 +63,21 @@ namespace RAWG.Net
             string website = GetValue(Website);
             string rating = GetValue(UserRating);
             string developerID = GetValue(DeveloperID);
+            string publisherID = GetValue(PublisherID);
 
             var trailers = GetTrailersAsync().Result;
-            string _trailers = "N/A";
+            string _trailers = "";
             if (trailers != null)
                 foreach (var trailer in trailers)
                     _trailers += trailer.ToString();
+            else _trailers = "N/A";
+
+            var dlcs = GetDLCsAsync().Result;
+            string _dlcs = "";
+            if (dlcs != null)
+                foreach (var dlc in dlcs)
+                    _dlcs += dlc.ToString();
+            else _dlcs = "N/A";
 
             return $"Name: {Name}\n" +
                 $"ID: {ID}\n" +
@@ -64,9 +87,11 @@ namespace RAWG.Net
                 $"Image-URI: {image}\n" +
                 $"Website: {website}\n" +
                 $"Developer ID: {developerID}\n" +
+                $"Publisher ID: {publisherID}\n" +
                 $"Rating: {rating}\n" +
                 $"ESRB Rating: {ESRB}\n" +
-                $"Trailer(s): {_trailers}";
+                $"Trailer(s): \n\n{_trailers}" +
+                $"DLC(s): \n\n{_dlcs}";
         }
 
         public class Rating
@@ -86,8 +111,7 @@ namespace RAWG.Net
 
             public override string ToString()
             {
-                return $"\n      Title: {Title}\n" +
-                    $"      User Ratings: {Count} ({Percentage}%)";
+                return $" {Title} - User Ratings: {Count} ({Percentage}%)";
             }
         }
     }

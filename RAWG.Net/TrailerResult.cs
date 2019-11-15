@@ -2,9 +2,9 @@
 {
     public class TrailerResult : Result
     {
-        public string Title { get; private set; }
-        public int? ID { get; private set; }
-        public string URI { get; private set; }
+        public string Title { get; }
+        public int? ID { get; }
+        public string URI { get; }
 
         private int count;
         private dynamic[] data;
@@ -26,7 +26,7 @@
             if (count <= 0)
                 return null;
 
-            TrailerResult[] trailers = new TrailerResult[count];
+            var trailers = new TrailerResult[count];
             trailers[0] = this;
             for (int i = 1; i < count; i++)
                 trailers[i] = new TrailerResult(count, i, data);
@@ -35,9 +35,9 @@
 
         public override string ToString()
         {
-            return $"\n      Title: {Title}\n" +
-                $"      ID: {ID}\n" +
-                $"      URI: {URI}\n\n";
+            return $"Title: {Title}\n" +
+                $"ID: {ID}\n" +
+                $"URI: {URI}\n\n";
         }
     }
 }

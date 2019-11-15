@@ -4,8 +4,8 @@ namespace RAWG.Net
 {
     internal class Response
     {
-        public string Message { get; private set; } = "Error";
-        public bool Error { get; private set; } = true;
+        public string Message { get; } = "Error";
+        public bool Error { get; } = true;
 
         public Response(HttpStatusCode status)
         {
