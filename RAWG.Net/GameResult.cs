@@ -85,14 +85,14 @@ namespace RAWG.Net
             string _trailers = "";
             if (trailers != null)
                 foreach (var trailer in trailers)
-                    _trailers += trailer.ToString();
+                    _trailers += "\n" + trailer.ToString();
             else _trailers = "N/A";
 
             var dlcs = GetTrailersAsync().Result;
             string _dlcs = "";
             if (dlcs != null)
                 foreach (var dlc in dlcs)
-                    _dlcs += dlc.ToString();
+                    _dlcs += "\n" + dlc.ToString();
             else _dlcs = "N/A";
 
             return $"Name: {Name}\n" +
@@ -106,8 +106,8 @@ namespace RAWG.Net
                 $"Publisher ID: {publisherID}\n" +
                 $"Rating: {rating}\n" +
                 $"ESRB Rating: {ESRB}\n" +
-                $"Trailer(s): \n\n{_trailers}" +
-                $"DLC(s): \n\n{_dlcs}";
+                $"Trailer(s): {_trailers}\n" +
+                $"DLC(s): {_dlcs}";
         }
 
         public class Rating

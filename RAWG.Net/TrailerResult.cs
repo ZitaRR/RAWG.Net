@@ -41,7 +41,7 @@
         {
             return $"Title: {Title}\n" +
                 $"ID: {ID}\n" +
-                $"URI: {URI}\n\n";
+                $"URI: {URI}";
         }
     }
 }

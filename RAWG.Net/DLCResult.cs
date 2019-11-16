@@ -46,7 +46,7 @@ namespace RAWG.Net
 
             return $"Title: {Name}\n" +
                 $"ID: {ID}\n" +
-                $"Released: {release}\n\n";
+                $"Released: {release}";
         }
     }
 }
