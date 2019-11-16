@@ -21,6 +21,10 @@
             URI = data[index].data.max;
         }
 
+        /// <summary>
+        ///     Gets all the trailers for a game
+        /// </summary>
+        /// <returns>An array of trailers</returns>
         internal TrailerResult[] Initialize()
         {
             if (count <= 0)

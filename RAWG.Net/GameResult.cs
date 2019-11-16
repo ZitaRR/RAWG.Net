@@ -14,8 +14,8 @@ namespace RAWG.Net
         public string Website { get; }
         public Rating UserRating { get; }
         public string ESRB { get; }
-        public int DeveloperID { get; }
-        public int PublisherID { get; }
+        public int? DeveloperID { get; }
+        public int? PublisherID { get; }
 
         public GameResult(string name = null, int? id = null, string description = "", int? metaCritic = null,
             string released = null, string background_image = null, string website = null, dynamic esrb_rating = null,
@@ -34,21 +34,37 @@ namespace RAWG.Net
             PublisherID = publishers[0].id;
         }
 
+        /// <summary>
+        ///     Gets all the DLC's for ths game
+        /// </summary>
+        /// <returns>An array of DLC's for this game</returns>
         public async Task<DLCResult[]> GetDLCsAsync()
         {
             var dlcs = await client.SendRequestAsync<DLCResult>(RAWGClient.ENDPOINT + $"games/{ID}/additions");
             return dlcs.Initialize();
         }
 
+        /// <summary>
+        ///     Gets all the trailers for this game
+        /// </summary>
+        /// <returns>An array of trailers for this game</returns>
         public async Task<TrailerResult[]> GetTrailersAsync()
         {
             var trailers = await client.SendRequestAsync<TrailerResult>(RAWGClient.ENDPOINT + $"games/{ID}/movies");
             return trailers.Initialize();
         }
 
+        /// <summary>
+        ///     Gets the developer for this game
+        /// </summary>
+        /// <returns>DeveloperResult with info about the developer</returns>
         public async Task<DeveloperResult> GetDeveloperAsync()
             => await client.SendRequestAsync<DeveloperResult>(RAWGClient.ENDPOINT + $"developers/{DeveloperID}");
 
+        /// <summary>
+        ///     Gets the publisher for this game
+        /// </summary>
+        /// <returns>PublisherResult with info about the publisher</returns>
         public async Task<PublisherResult> GetPublisherAsync()
             => await client.SendRequestAsync<PublisherResult>(RAWGClient.ENDPOINT + $"publishers/{PublisherID}");
 
@@ -72,7 +88,7 @@ namespace RAWG.Net
                     _trailers += trailer.ToString();
             else _trailers = "N/A";
 
-            var dlcs = GetDLCsAsync().Result;
+            var dlcs = GetTrailersAsync().Result;
             string _dlcs = "";
             if (dlcs != null)
                 foreach (var dlc in dlcs)

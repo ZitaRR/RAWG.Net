@@ -24,6 +24,10 @@ namespace RAWG.Net
             Released = DateTime.TryParse(data[index].released.ToString(), out DateTime time) ? time as DateTime? : null;
         }
 
+        /// <summary>
+        ///     Gets all the DLC's for a game
+        /// </summary>
+        /// <returns>An array of DLC's</returns>
         internal DLCResult[] Initialize()
         {
             if (count <= 0)

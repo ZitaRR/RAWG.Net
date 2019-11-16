@@ -14,6 +14,12 @@ namespace RAWG.Net
         private SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
         private bool disposed = false;
 
+        /// <summary>
+        ///     Initializes this class
+        /// </summary>
+        /// <param name="status">Http response code</param>
+        /// <param name="client">The client</param>
+        /// <returns>The result of the request</returns>
         internal Result Initialize(HttpStatusCode status, RAWGClient client)
         {
             this.client = client;
@@ -21,6 +27,11 @@ namespace RAWG.Net
             return this;
         }
 
+        /// <summary>
+        ///     Formats the object into a string for representation
+        /// </summary>
+        /// <param name="_object"></param>
+        /// <returns>A string representating object</returns>
         internal string GetValue(object _object)
         {
             if (_object is null ||
@@ -29,6 +40,11 @@ namespace RAWG.Net
             return _object.ToString();
         }
 
+        /// <summary>
+        ///     Formats the DateTime into a string for representation
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns>A string representating DateTime</returns>
         internal string GetValue(DateTime? time)
         {
             if (time is null)

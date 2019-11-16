@@ -23,6 +23,10 @@ namespace RAWG.Net
             data = results[0].top_games;
         }
 
+        /// <summary>
+        ///     Gets the top 30 games created by the developer this class is representing
+        /// </summary>
+        /// <returns>An IReadOnlyCollection with all the games</returns>
         public async Task<IReadOnlyCollection<GameResult>> GetGames()
         {
             if (games != null && gamesReadonly != null)

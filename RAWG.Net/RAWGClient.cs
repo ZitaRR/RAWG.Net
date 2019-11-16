@@ -17,22 +17,27 @@ namespace RAWG.Net
             client.DefaultRequestHeaders.Add("User-Agent", "RAWG Wrapper");
         }
 
+        /// <summary>
+        ///     Formats raw html code
+        /// </summary>
+        /// <param name="text">Html code</param>
+        /// <returns>Formatted html code</returns>
         internal static string FormatText(string text)
         {
+            if (text is null)
+                return string.Empty;
             text = Regex.Replace(text, @"<[^>]*>", "");
             return Regex.Replace(text, @"[\.\,\-\!\?]", (c) => c.NextMatch().Value == " " ? c + " " : c.Value);
         }
 
-        public async Task<dynamic> Test(string query)
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, query);
-            HttpResponseMessage response = await client.SendAsync(request);
-
-            string content = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<dynamic>(content);
-        }
-
-        public async Task<T> SendRequestAsync<T>(string query) where T : Result
+        /// <summary>
+        ///     Downloads the content of the webpage as a string and 
+        ///     deserializes it into the specified class. 
+        /// </summary>
+        /// <typeparam name="T">Specifies what class it should deserialize to</typeparam>
+        /// <param name="query">Endpoint</param>
+        /// <returns>The class that was specified with all the data if the request was successful</returns>
+        internal async Task<T> SendRequestAsync<T>(string query) where T : Result
         {
             var request = new HttpRequestMessage(HttpMethod.Get, query);
             HttpResponseMessage response = await client.SendAsync(request);
@@ -54,9 +59,19 @@ namespace RAWG.Net
             }
         }
 
+        /// <summary>
+        ///     Gets info about a game
+        /// </summary>
+        /// <param name="id">ID of the game</param>
+        /// <returns>GameResult with info about the game</returns>
         public async Task<GameResult> GetGameAsync(int id)
             => await SendRequestAsync<GameResult>(ENDPOINT + $"games/{id}");
 
+        /// <summary>
+        ///     Gets info about a game
+        /// </summary>
+        /// <param name="slug">Name of the game</param>
+        /// <returns>GameResult with info about the game</returns>
         public async Task<GameResult> GetGameAsync(string slug)
         {
             slug = slug.Replace(" ", "-");
